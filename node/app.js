@@ -17,6 +17,10 @@ const
   express = require('express'),
   https = require('https'),  
   request = require('request');
+  app = express();
+
+var Recastai = require('recastai')
+var recastClient = new Recastai.request(config.get('recastRequestAccessToken'))
 
 var app = express();
 app.set('port', process.env.PORT || 5000);
@@ -254,62 +258,25 @@ function receivedMessage(event) {
     // If we receive a text message, check to see if it matches any special
     // keywords and send back the corresponding example. Otherwise, just echo
     // the text we received.
-    switch (messageText) {
-      case 'image':
-        sendImageMessage(senderID);
-        break;
-
-      case 'gif':
-        sendGifMessage(senderID);
-        break;
-
-      case 'audio':
-        sendAudioMessage(senderID);
-        break;
-
-      case 'video':
-        sendVideoMessage(senderID);
-        break;
-
-      case 'file':
-        sendFileMessage(senderID);
-        break;
-
-      case 'button':
-        sendButtonMessage(senderID);
-        break;
-
-      case 'generic':
-        sendGenericMessage(senderID);
-        break;
-
-      case 'receipt':
-        sendReceiptMessage(senderID);
-        break;
-
-      case 'quick reply':
-        sendQuickReply(senderID);
-        break;        
-
-      case 'read receipt':
-        sendReadReceipt(senderID);
-        break;        
-
-      case 'typing on':
-        sendTypingOn(senderID);
-        break;        
-
-      case 'typing off':
-        sendTypingOff(senderID);
-        break;        
-
-      case 'account linking':
-        sendAccountLinking(senderID);
-        break;
-
-      default:
-        sendTextMessage(senderID, messageText);
+    var greeting = new RegExp(/^(yo|ola|hola|howdy|hi|hey|hello|bonjour)/i);
+  if (messageText.match(greeting)) {
+    sayHello(senderID);
+  } else {
+  recastClient.analyseText(messageText).then(function(response) {
+    var intent = response.intent().slug
+    if (intent == 'greetings') {
+      sayHello(senderID)
+    } else if (intent == 'goodbye') {
+      sendTextMessage(senderID, "Bye, see you soon!")
+    } else if (intent == 'are-you-bot') {
+      sendTextMessage(senderID, "Pas du tout, je suis un ami !");
+    } else {
+      sendTextMessage(senderID, messageText);
     }
+  }).catch(function(error) {
+    console.log(error)
+  })
+}
   } else if (messageAttachments) {
     sendTextMessage(senderID, "Message with attachment received");
   }
@@ -825,6 +792,22 @@ function callSendAPI(messageData) {
       console.error("Failed calling Send API", response.statusCode, response.statusMessage, body.error);
     }
   });  
+}
+
+function sayHello(senderID) {
+  request({
+    uri: `https://graph.facebook.com/v2.9/${senderID}`,
+    qs: { access_token: PAGE_ACCESS_TOKEN },
+    method: 'GET',
+    json: true
+  }, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      console.log(bodyParser)
+      sendTextMessage(senderID, "Hey " + body.first_name);
+    } else {
+      console.log(error)
+    }
+  });
 }
 
 // Start server

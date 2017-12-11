@@ -1,6 +1,7 @@
 {
-    "appSecret": "",
-    "pageAccessToken": "",
-    "validationToken": "",
-    "serverURL": ""
+    "appSecret": "ef30a156315129238db366deac98ca13",
+    "pageAccessToken": "EAACLGaVlYhQBAPjBvfUqALdP1cmvucSNyUQAeqtSWK5dzaSuIL0ZBNbGZC7DXNBFpskgZAlqxmb5SQuZBPoaZBjQykLOotwGIcH104nbmOH8BZBkp11AZAd0JdQitdSilfikzxvet9C2NQRMxPRMBoUO1r8Lue4taAkXy56u1nQSgZDZD",
+    "validationToken": "folhomee",
+    "serverURL": "https://639a1d66.ngrok.io",
+    "recastRequestAccessToken": "9744d8a43c3482e8141d1467dae79e03"
 }
